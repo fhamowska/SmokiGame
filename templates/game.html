@@ -1,0 +1,54 @@
+{% block head %}
+    <title>Smoki Game :)</title>
+{% endblock %}
+
+{% block body %}
+    <div class="game-container">
+    <h3>Current Turn: Player {{ current_player + 1 }}</h3>
+        <div class="players">
+            {% for player_hand in players %}
+                <div class="player">
+                    <h3>Player {{ loop.index }}'s Hand:</h3>
+                    <ul>
+                        {% for card in player_hand %}
+                            <li>{{ card.number }}{% if card.action %}{{ card.action }}{% endif %}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="piles">
+            <div class="face-down-pile">
+                <h3>Face-Down Pile</h3>
+                <p>{{ face_down_top.number }}{% if face_down_top.action %}{{ face_down_top.action }}{% endif %}</p>
+            </div>
+            <div class="face-up-pile">
+                <h3>Face-Up Pile 1</h3>
+                <p>{{ face_up_top_1.number }}{% if face_up_top_1.action %}{{ face_up_top_1.action }}{% endif %}</p>
+            </div>
+            <div class="face-up-pile">
+                <h3>Face-Up Pile 2</h3>
+                <p>{{ face_up_top_2.number }}{% if face_up_top_2.action %}{{ face_up_top_2.action }}{% endif %}</p>
+            </div>
+        </div>
+    </div>
+    <div class="player-actions">
+        <form method="post" action="{{ url_for('game') }}">
+            <input type="hidden" name="player_index" value="0">
+            <button type="submit" name="action" value="take_face_up">Take Face-Up</button>
+            <label for="pile_index">From Pile:</label>
+            <select id="pile_index" name="pile_index">
+                <option value="1">Pile 1</option>
+                <option value="2">Pile 2</option>
+            </select>
+            <button type="submit" name="action" value="take_face_down">Take Face-Down</button>
+        </form>
+    </div>
+
+    {% if action_result %}
+        <div class="action-result">
+            <p>{{ action_result.number }}{% if action_result.action %}{{ action_result.action }}{% endif %}</p>
+        </div>
+    {% endif %}
+{% endblock %}
