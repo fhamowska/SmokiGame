@@ -1,47 +1,69 @@
+{% extends 'base.html' %}
+
 {% block head %}
     <title>Smoki Game :)</title>
 {% endblock %}
 
 {% block body %}
     <div class="game-container">
-    <h3>Current Turn: Player {{ current_player + 1 }}</h3>
-        <div class="players">
+    <h1>Smoki Game</h1>
+    <h2>Current Turn: Player {{ current_player + 1 }}</h2>
+        <div class="container">
             {% for player_hand in players %}
-                <div class="player">
+                <div>
                     <h3>Player {{ loop.index }}'s Hand:</h3>
-                    <ul>
+                    <div class="section">
                         {% for card in player_hand %}
-                            <li>{{ card.number }}{% if card.action %}{{ card.action }}{% endif %}</li>
+                            <div class="card">
+                            <div class="face-down">
+                                <p>
+                                    {{ card.number }}{% if card.action %}{{ card.action }}{% endif %}
+                                </p>
+                            </div>
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 </div>
             {% endfor %}
         </div>
 
-        <div class="piles">
-            <div class="face-down-pile">
+        <div class="container">
+        <div class="section">
+            <div class="pile">
                 <h3>Face-Down Pile</h3>
                     <button id="revealButton" onclick="revealFaceDown()">Reveal Face-Down Card</button>
-                    <p id="faceDownCard" style="display: none;">{{ face_down_top.number }}{% if face_down_top.action %}{{ face_down_top.action }}{% endif %}</p>
+                    <div class="card">
+                        <div class="face-down">
+                            <p id="faceDownCard">{{ face_down_top.number }}{% if face_down_top.action %}{{ face_down_top.action }}{% endif %}</p>
+                        </div>
+                    </div>
             </div>
-            <div class="face-up-pile">
+            <div class="pile">
                 <h3>Face-Up Pile 1</h3>
-                {% if updated_card and updated_pile_index == 1 %}
-                    <p>{{ updated_card.number }}{% if updated_card.action %}{{ updated_card.action }}{% endif %}</p>
-                {% else %}
-                    <p>{{ face_up_top_1.number }}{% if face_up_top_1.action %}{{ face_up_top_1.action }}{% endif %}</p>
-                {% endif %}
+                <div class="card">
+                    <div class="face-up">
+                        {% if updated_card and updated_pile_index == 1 %}
+                            <p>{{ updated_card.number }}{% if updated_card.action %}{{ updated_card.action }}{% endif %}</p>
+                        {% else %}
+                            <p>{{ face_up_top_1.number }}{% if face_up_top_1.action %}{{ face_up_top_1.action }}{% endif %}</p>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="face-up-pile">
+            <div class="pile">
                 <h3>Face-Up Pile 2</h3>
-                {% if updated_card and updated_pile_index == 2 %}
-                    <p>{{ updated_card.number }}{% if updated_card.action %}{{ updated_card.action }}{% endif %}</p>
-                {% else %}
-                    <p>{{ face_up_top_2.number }}{% if face_up_top_2.action %}{{ face_up_top_2.action }}{% endif %}</p>
-                {% endif %}
+                <div class="card">
+                    <div class="face-up">
+                        {% if updated_card and updated_pile_index == 2 %}
+                            <p>{{ updated_card.number }}{% if updated_card.action %}{{ updated_card.action }}{% endif %}</p>
+                        {% else %}
+                            <p>{{ face_up_top_2.number }}{% if face_up_top_2.action %}{{ face_up_top_2.action }}{% endif %}</p>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+        <div class="section">
 <div class="player-actions">
         <form method="post" action="{{ url_for('game') }}">
             <input type="hidden" name="player_index" value="0">
@@ -64,9 +86,13 @@
             <p>{{ action_result.number }}{% if action_result.action %}{{ action_result.action }}{% endif %}</p>
         </div>
     {% endif %}
+        </div>
+    </div>
+    </div>
 <script>
     function revealFaceDown() {
-        document.getElementById('faceDownCard').style.display = 'block';
+        document.getElementById('faceDownCard').style.opacity = '100%';
+        document.getElementById('faceDownCard').style.backgroundColor = 'white';
         document.getElementById('revealButton').style.display = 'none';
     }
 </script>

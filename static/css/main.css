@@ -1,9 +1,82 @@
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    box-sizing: border-box;
+    font-family: Verdana, sans-serif;
+    scroll-behavior: smooth;
 }
 
 body {
-  font-family: sans-serif;
+    background-color: #eceadd;
+    color: #4e272a;
+}
+
+.game-container {
+    padding: 10px;
+    display: block;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    margin: 0 20%;
+    display: block;
+    justify-content: center;
+    align-items: center;
+}
+
+h1, h2, h3{
+    padding: 10px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+h1 {
+    font-size: 1.4em;
+}
+
+.section {
+    width: 100%;
+    text-align: center;
+}
+
+.pile {
+    width: 30%;
+    display: inline-block;
+    position: relative;
+}
+
+.card {
+    display: inline-block;
+    position: relative;
+    background-color: white;
+    width: 80px;
+    height: 130px;
+    margin: 5px;
+    border-radius: 8px;
+    border: solid 5px #4e272a;
+}
+
+.card p {
+    padding-top: 40px;
+    text-align: center;
+    font-size: 1.6em;
+    width: 100%;
+    height: 100%;
+}
+
+.face-down,
+.face-up {
+    width: 100%;
+    height: 100%;
+}
+
+.face-down {
+    background-color: #93AC97;
+}
+
+.face-down p {
+    opacity: 0;
 }
