@@ -56,20 +56,31 @@ class Game:
         self.face_up_pile_2.append(card_2)
         self.face_down_pile.append(card_3)
 
-    def take_face_up_card(self, pile_index):
+    def take_face_up_card(self, pile_index, exchange_index):
         if pile_index == 1 and self.face_up_pile_1:
-            card = self.face_up_pile_1.pop()
+            new_card = self.face_up_pile_1.pop()
         elif pile_index == 2 and self.face_up_pile_2:
-            card = self.face_up_pile_2.pop()
+            new_card = self.face_up_pile_2.pop()
         else:
             return None  # Invalid pile_index
 
-        # Perform actions based on the game rules
-        self.players[self.current_player].append(card)
-        self.fill_piles()
-        self.switch_to_next_player()
+        # Player chooses which card to exchange
+        if 0 <= exchange_index < len(self.players[self.current_player]):
+            old_card = self.players[self.current_player].pop(exchange_index)
+            self.players[self.current_player].insert(exchange_index, new_card)
 
-        return card
+            # Place the old card on top of the face-up pile
+            if pile_index == 1:
+                self.face_up_pile_1.insert(0, old_card)
+            else:
+                self.face_up_pile_2.insert(0, old_card)
+
+            self.switch_to_next_player()
+
+            return old_card
+        else:
+            # Invalid exchange_index
+            return None
 
     def fill_piles(self):
 
@@ -123,7 +134,8 @@ def game():
         pile_index = int(request.form['pile_index'])
 
         if action == 'take_face_up':
-            card = game.take_face_up_card(pile_index)
+            exchange_index = int(request.form['exchange_index'])
+            card = game.take_face_up_card(pile_index, exchange_index)
         elif action == 'take_face_down':
             card = game.take_face_down_card()
             revealed = True  # Set revealed status to True
@@ -147,6 +159,7 @@ def game():
                            face_up_top_1=game.face_up_pile_1[-1] if game.face_up_pile_1 else None,
                            face_up_top_2=game.face_up_pile_2[-1] if game.face_up_pile_2 else None,
                            revealed=revealed)  # Pass revealed status to the template
+
 
 
 if __name__ == '__main__':

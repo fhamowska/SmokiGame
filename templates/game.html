@@ -26,15 +26,23 @@
             </div>
             <div class="face-up-pile">
                 <h3>Face-Up Pile 1</h3>
-                <p>{{ face_up_top_1.number }}{% if face_up_top_1.action %}{{ face_up_top_1.action }}{% endif %}</p>
+                {% if updated_card and updated_pile_index == 1 %}
+                    <p>{{ updated_card.number }}{% if updated_card.action %}{{ updated_card.action }}{% endif %}</p>
+                {% else %}
+                    <p>{{ face_up_top_1.number }}{% if face_up_top_1.action %}{{ face_up_top_1.action }}{% endif %}</p>
+                {% endif %}
             </div>
             <div class="face-up-pile">
                 <h3>Face-Up Pile 2</h3>
-                <p>{{ face_up_top_2.number }}{% if face_up_top_2.action %}{{ face_up_top_2.action }}{% endif %}</p>
+                {% if updated_card and updated_pile_index == 2 %}
+                    <p>{{ updated_card.number }}{% if updated_card.action %}{{ updated_card.action }}{% endif %}</p>
+                {% else %}
+                    <p>{{ face_up_top_2.number }}{% if face_up_top_2.action %}{{ face_up_top_2.action }}{% endif %}</p>
+                {% endif %}
             </div>
         </div>
     </div>
-    <div class="player-actions">
+<div class="player-actions">
         <form method="post" action="{{ url_for('game') }}">
             <input type="hidden" name="player_index" value="0">
             <button type="submit" name="action" value="take_face_up">Take Face-Up</button>
@@ -43,13 +51,10 @@
                 <option value="1">Pile 1</option>
                 <option value="2">Pile 2</option>
             </select>
+            <!-- Add input for exchange_index -->
+            <label for="exchange_index">Exchange Card Index:</label>
+            <input type="number" id="exchange_index" name="exchange_index" required>
             <button type="submit" name="action" value="take_face_down">Take Face-Down</button>
-            <!-- Add a new select dropdown for leaving the face-down card -->
-            <label for="leave_pile_index">Leave on Pile:</label>
-            <select id="leave_pile_index" name="leave_pile_index">
-                <option value="1">Pile 1</option>
-                <option value="2">Pile 2</option>
-            </select>
             <button type="submit" name="action" value="leave_face_down">Leave Face-Down</button>
         </form>
     </div>
