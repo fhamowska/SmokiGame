@@ -82,7 +82,7 @@ class Game:
         while len(self.face_down_pile) < 2:
             self.face_down_pile.append(deck.cards.pop(0))
 
-    def take_face_down_card(self, player_index):
+    def take_face_down_card(self):
         if not self.face_down_pile:
             return None  # No cards in the face-down pile
 
@@ -90,7 +90,7 @@ class Game:
 
         # Perform actions based on the game rules
         if self.card_suits_player(card):
-            self.players[player_index].append(card)
+            self.players[self.current_player].append(card)
             self.fill_piles()
             self.switch_to_next_player()
 
@@ -109,7 +109,7 @@ def game():
         if action == 'take_face_up':
             card = game.take_face_up_card(pile_index)
         if action == 'take_face_down':
-            card = game.take_face_down_card(player_index)
+            card = game.take_face_down_card()
         else:
             card = None
 
