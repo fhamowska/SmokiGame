@@ -21,7 +21,8 @@
         <div class="piles">
             <div class="face-down-pile">
                 <h3>Face-Down Pile</h3>
-                <p>{{ face_down_top.number }}{% if face_down_top.action %}{{ face_down_top.action }}{% endif %}</p>
+                    <button id="revealButton" onclick="revealFaceDown()">Reveal Face-Down Card</button>
+                    <p id="faceDownCard" style="display: none;">{{ face_down_top.number }}{% if face_down_top.action %}{{ face_down_top.action }}{% endif %}</p>
             </div>
             <div class="face-up-pile">
                 <h3>Face-Up Pile 1</h3>
@@ -43,6 +44,7 @@
                 <option value="2">Pile 2</option>
             </select>
             <button type="submit" name="action" value="take_face_down">Take Face-Down</button>
+            <button type="submit" name="action" value="leave_face_down">Leave Face-Down</button>
         </form>
     </div>
 
@@ -51,4 +53,10 @@
             <p>{{ action_result.number }}{% if action_result.action %}{{ action_result.action }}{% endif %}</p>
         </div>
     {% endif %}
+<script>
+    function revealFaceDown() {
+        document.getElementById('faceDownCard').style.display = 'block';
+        document.getElementById('revealButton').style.display = 'none';
+    }
+</script>
 {% endblock %}

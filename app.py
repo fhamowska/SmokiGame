@@ -89,43 +89,58 @@ class Game:
         card = self.face_down_pile.pop()
 
         # Perform actions based on the game rules
-        if self.card_suits_player(card):
-            self.players[self.current_player].append(card)
-            self.fill_piles()
-            self.switch_to_next_player()
+        self.players[self.current_player].append(card)
+        self.fill_piles()
+        self.switch_to_next_player()
 
         return card
 
-    def card_suits_player(self, card):
-        return True
+    def leave_face_down_card(self):
+        if not self.face_down_pile:
+            return None  # No cards in the face-down pile
+
+        card = self.face_down_pile.pop()
+
+        # Perform actions based on the game rules
+        # You can modify this logic based on your game rules
+        self.face_up_pile_1.append(card)
+        self.fill_piles()
+        self.switch_to_next_player()
+
+        return card
+
 
 @app.route('/game', methods=['GET', 'POST'])
 def game():
+    revealed = False  # Initialize revealed status
     if request.method == 'POST':
         action = request.form['action']
-        player_index = int(request.form['player_index'])
         pile_index = int(request.form['pile_index'])
 
         if action == 'take_face_up':
             card = game.take_face_up_card(pile_index)
-        if action == 'take_face_down':
+        elif action == 'take_face_down':
             card = game.take_face_down_card()
-        else:
-            card = None
+            revealed = True  # Set revealed status to True
+        elif action == 'leave_face_down':
+            card = game.leave_face_down_card()
+            revealed = False  # Reset revealed status
 
         return render_template('game.html',
                                players=game.players,
                                current_player=game.current_player,
                                face_down_top=game.face_down_pile[-1] if game.face_down_pile else None,
                                face_up_top_1=game.face_up_pile_1[-1] if game.face_up_pile_1 else None,
-                               face_up_top_2=game.face_up_pile_2[-1] if game.face_up_pile_2 else None)
+                               face_up_top_2=game.face_up_pile_2[-1] if game.face_up_pile_2 else None,
+                               revealed=revealed)  # Pass revealed status to the template
 
     return render_template('game.html',
                            players=game.players,
                            current_player=game.current_player,
                            face_down_top=game.face_down_pile[-1] if game.face_down_pile else None,
                            face_up_top_1=game.face_up_pile_1[-1] if game.face_up_pile_1 else None,
-                           face_up_top_2=game.face_up_pile_2[-1] if game.face_up_pile_2 else None)
+                           face_up_top_2=game.face_up_pile_2[-1] if game.face_up_pile_2 else None,
+                           revealed=revealed)  # Pass revealed status to the template
 
 
 if __name__ == '__main__':
