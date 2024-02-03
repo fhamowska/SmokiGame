@@ -93,18 +93,23 @@ class Game:
         while len(self.face_down_pile) < 2:
             self.face_down_pile.append(deck.cards.pop(0))
 
-    def take_face_down_card(self):
-        if not self.face_down_pile:
-            return None  # No cards in the face-down pile
+    def take_face_down_card(self, exchange_index):
+        if not self.face_down_pile or not self.players[self.current_player]:
+            return None  # No cards in the face-down pile or player's hand
 
-        card = self.face_down_pile.pop()
+        new_card = self.face_down_pile.pop()
 
-        # Perform actions based on the game rules
-        self.players[self.current_player].append(card)
-        self.fill_piles()
-        self.switch_to_next_player()
+        if 0 <= exchange_index < len(self.players[self.current_player]):
+            old_card = self.players[self.current_player].pop(exchange_index)
+            self.players[self.current_player].insert(exchange_index, new_card)
 
-        return card
+            self.face_up_pile_1.append(old_card)
+            self.fill_piles()
+            self.switch_to_next_player()
+            return old_card
+        else:
+            # Invalid exchange_index
+            return None
 
     def leave_face_down_card(self, leave_pile_index):
         if not self.face_down_pile:
@@ -137,7 +142,8 @@ def game():
             exchange_index = int(request.form['exchange_index'])
             card = game.take_face_up_card(pile_index, exchange_index)
         elif action == 'take_face_down':
-            card = game.take_face_down_card()
+            exchange_index = int(request.form['exchange_index'])
+            card = game.take_face_down_card(exchange_index)
             revealed = True  # Set revealed status to True
         elif action == 'leave_face_down':
             leave_pile_index = int(request.form['leave_pile_index'])
