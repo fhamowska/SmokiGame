@@ -95,15 +95,20 @@ class Game:
 
         return card
 
-    def leave_face_down_card(self):
+    def leave_face_down_card(self, leave_pile_index):
         if not self.face_down_pile:
             return None  # No cards in the face-down pile
 
         card = self.face_down_pile.pop()
 
         # Perform actions based on the game rules
-        # You can modify this logic based on your game rules
-        self.face_up_pile_1.append(card)
+        if leave_pile_index == 1:
+            self.face_up_pile_1.append(card)
+        elif leave_pile_index == 2:
+            self.face_up_pile_2.append(card)
+        else:
+            return None  # Invalid leave_pile_index
+
         self.fill_piles()
         self.switch_to_next_player()
 
@@ -123,7 +128,8 @@ def game():
             card = game.take_face_down_card()
             revealed = True  # Set revealed status to True
         elif action == 'leave_face_down':
-            card = game.leave_face_down_card()
+            leave_pile_index = int(request.form['leave_pile_index'])
+            card = game.leave_face_down_card(leave_pile_index)
             revealed = False  # Reset revealed status
 
         return render_template('game.html',
