@@ -71,9 +71,9 @@ class Game:
 
             # Place the old card on top of the face-up pile
             if pile_index == 1:
-                self.face_up_pile_1.insert(0, old_card)
+                self.face_up_pile_1.append(old_card)
             else:
-                self.face_up_pile_2.insert(0, old_card)
+                self.face_up_pile_2.append(old_card)
 
             self.switch_to_next_player()
 
