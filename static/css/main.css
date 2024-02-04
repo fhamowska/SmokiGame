@@ -8,7 +8,7 @@
 }
 
 body {
-    background-color: #eceadd;
+    background-color: #FFF5DE;
     color: #4e272a;
 }
 
@@ -38,6 +38,7 @@ h1 {
 }
 
 .section {
+    margin-top: 10px;
     width: 100%;
     text-align: center;
 }
@@ -48,7 +49,7 @@ h1 {
     position: relative;
 }
 .hand {
-    width: 90%;
+    width: 42%;
     display: inline-block;
     position: relative;
 }
@@ -79,7 +80,7 @@ h1 {
 }
 
 .face-down {
-    background-color: #93AC97;
+    background-color: #F5AB64;
 }
 
 .face-down p {
@@ -119,8 +120,14 @@ select, button {
     cursor: pointer
 }
 
+.turn {
+    width: 16%;
+    display: inline-block;
+    position: relative;
+}
+
 button:hover {
-    background-color: #93AC97;
+    background-color: #F5AB64;
 }
 
 button:active {

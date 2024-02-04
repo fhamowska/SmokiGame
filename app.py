@@ -39,9 +39,11 @@ class Game:
         self.face_up_pile_1 = []
         self.face_up_pile_2 = []
         self.current_player = 0
+        self.turn_counter = 0
 
     def switch_to_next_player(self):
         self.current_player = (self.current_player + 1) % self.num_players
+        self.turn_counter += 1
 
     def deal_cards(self, deck):
         for _ in range(6):
@@ -83,15 +85,29 @@ class Game:
             return None
 
     def fill_piles(self):
-
         while len(self.face_up_pile_1) < 2:
+            if not deck.cards:
+                self.shuffle_discard_piles()
             self.face_up_pile_1.append(deck.cards.pop(0))
 
         while len(self.face_up_pile_2) < 2:
+            if not deck.cards:
+                self.shuffle_discard_piles()
             self.face_up_pile_2.append(deck.cards.pop(0))
 
         while len(self.face_down_pile) < 2:
+            if not deck.cards:
+                self.shuffle_discard_piles()
             self.face_down_pile.append(deck.cards.pop(0))
+
+    def shuffle_discard_piles(self):
+        random.shuffle(self.face_up_pile_1)
+        random.shuffle(self.face_up_pile_2)
+        random.shuffle(self.face_down_pile)
+        deck.cards.extend(self.face_up_pile_1)
+        deck.cards.extend(self.face_up_pile_2)
+        deck.cards.extend(self.face_down_pile)
+        random.shuffle(deck.cards)
 
     def take_face_down_card(self, exchange_index):
         if not self.face_down_pile or not self.players[self.current_player]:
@@ -124,6 +140,16 @@ class Game:
         self.switch_to_next_player()
 
         return card
+
+@app.route('/new_game', methods=['POST'])
+def new_game():
+    global game, deck  # Assuming you want to reset the game and deck globally
+    game = Game()
+    deck = Deck()
+    deck.generate_deck()
+    game.deal_cards(deck)
+    game.reveal_deck_cards(deck)
+    return redirect(url_for('game'))
 
 @app.route('/end_screen', methods=['GET', 'POST'])
 def end_screen():
@@ -198,7 +224,8 @@ def game():
                                face_down_top=game.face_down_pile[-1] if game.face_down_pile else None,
                                face_up_top_1=game.face_up_pile_1[-1] if game.face_up_pile_1 else None,
                                face_up_top_2=game.face_up_pile_2[-1] if game.face_up_pile_2 else None,
-                               revealed=revealed)  # Pass revealed status to the template
+                               revealed=revealed,
+                               turn_counter=game.turn_counter)  # Pass revealed status to the template
 
     return render_template('game.html',
                            players=game.players,
@@ -206,7 +233,8 @@ def game():
                            face_down_top=game.face_down_pile[-1] if game.face_down_pile else None,
                            face_up_top_1=game.face_up_pile_1[-1] if game.face_up_pile_1 else None,
                            face_up_top_2=game.face_up_pile_2[-1] if game.face_up_pile_2 else None,
-                           revealed=revealed)  # Pass revealed status to the template
+                           revealed=revealed,
+                           turn_counter=game.turn_counter)  # Pass revealed status to the template
 
 
 

@@ -6,13 +6,17 @@
 
 {% block body %}
     <div class="game-container">
-    <h1>Smoki Game</h1>
-    <h2>Current Turn: Player {{ current_player + 1 }}</h2>
-        <div class="container">
-            {% for player_hand in players %}
-    <div>
-        <h3>Player {{ loop.index }}'s Hand:</h3>
         <div class="section">
+            <h1>Smoki Game</h1>
+            <h2 class="turn">Turn: {{ turn_counter + 1 }}</h2>
+            <h2 class="turn">Player: {{ current_player + 1 }}</h2>
+        </div>
+        <div class="container">
+        <div class="section">
+            {% for player_hand in players %}
+        <div class="hand">
+        <h3>Player {{ loop.index }}'s Hand:</h3>
+
             {% for card in player_hand %}
                 <div class="card">
                     {% if loop.index0 != 0 and loop.index != 6 %}
@@ -31,9 +35,9 @@
                     <br>
                 {% endif %}
             {% endfor %}
-        </div>
     </div>
 {% endfor %}
+        </div>
         </div>
 
         <div class="container">
