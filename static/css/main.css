@@ -13,7 +13,7 @@ body {
 }
 
 .game-container {
-    padding: 10px;
+    padding: 5px;
     display: block;
     justify-content: center;
     align-items: center;
@@ -27,7 +27,7 @@ body {
 }
 
 h1, h2, h3{
-    padding: 10px;
+    padding: 3px;
     text-align: center;
     font-size: 1.2em;
     font-weight: 600;
@@ -47,6 +47,11 @@ h1 {
     display: inline-block;
     position: relative;
 }
+.hand {
+    width: 90%;
+    display: inline-block;
+    position: relative;
+}
 
 .card {
     display: inline-block;
@@ -54,9 +59,9 @@ h1 {
     background-color: white;
     width: 80px;
     height: 130px;
-    margin: 5px;
+    margin: 4px;
     border-radius: 8px;
-    border: solid 5px #4e272a;
+    border: solid 6px #4e272a;
 }
 
 .card p {
@@ -79,4 +84,48 @@ h1 {
 
 .face-down p {
     opacity: 0;
+}
+
+.click {
+    cursor: pointer;
+    position: absolute;
+    text-align: center;
+    padding-left: 2px;
+    padding-top: 30px;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.player-actions .hide-at-start {
+    display: none;
+}
+
+form {
+    padding: 14px;
+}
+label{
+    padding: 16px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: white;
+}
+select, button {
+    margin-top: 5px;
+    padding: 16px 20px;
+    border-radius: 4px;
+    background-color: white;
+    border: solid 3px #4e272a;
+    cursor: pointer
+}
+
+button:hover {
+    background-color: #93AC97;
+}
+
+button:active {
+    background-color: #4e272a;
+}
+p {
+    text-align: center;
 }

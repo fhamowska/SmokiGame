@@ -111,24 +111,67 @@ class Game:
             # Invalid exchange_index
             return None
 
-    def leave_face_down_card(self, leave_pile_index):
+    def leave_face_down_card(self):
         if not self.face_down_pile:
             return None  # No cards in the face-down pile
 
         card = self.face_down_pile.pop()
 
         # Perform actions based on the game rules
-        if leave_pile_index == 1:
-            self.face_up_pile_1.append(card)
-        elif leave_pile_index == 2:
-            self.face_up_pile_2.append(card)
-        else:
-            return None  # Invalid leave_pile_index
+        self.face_up_pile_1.append(card)
 
         self.fill_piles()
         self.switch_to_next_player()
 
         return card
+
+@app.route('/end_screen', methods=['GET', 'POST'])
+def end_screen():
+    player_sums = []  # Initialize player_sums outside the if block
+    if request.method == 'POST':
+        # Iterate through all players
+        for player_hand in game.players:
+            for i, card in enumerate(player_hand):
+                if card.number == 11:
+                    # Handle edge cases for the card with number 11
+                    if i == 0:
+                        # First card can only take the value of the one on its right
+                        card.number = min(player_hand[i + 1].number, card.number)
+                    elif i == len(player_hand) - 1:
+                        # Last card can only take the value of the one on its left
+                        card.number = min(player_hand[i - 1].number, card.number)
+                    elif i % 3 == 0:
+                        # Cards at index 0, 3, 6 can only take the value of the one on their right
+                        card.number = min(player_hand[i + 1].number, card.number)
+                    elif i % 3 == 2:
+                        # Cards at index 2, 5, 8 can only take the value of the one on their left
+                        card.number = min(player_hand[i - 1].number, card.number)
+                    else:
+                        # All other cases, the card can take the value of the smallest from its left or right
+                        card.number = min(player_hand[i - 1].number, player_hand[i + 1].number, card.number)
+
+            # Now, check for the case of cards with the same value under each other (indexes 0, 3 and indexes 1, 4 and indexes 2, 5)
+            for i in range(0, len(player_hand) - 3, 3):
+                if player_hand[i].number == player_hand[i + 3].number:
+                    player_hand[i].number = 0
+                    player_hand[i + 3].number = 0
+
+                if player_hand[i + 1].number == player_hand[i + 4].number:
+                    player_hand[i + 1].number = 0
+                    player_hand[i + 4].number = 0
+
+                if player_hand[i + 2].number == player_hand[i + 5].number:
+                    player_hand[i + 2].number = 0
+                    player_hand[i + 5].number = 0
+
+            # Now, recalculate the sum of points for the player
+            player_sum = sum(card.number for card in player_hand)
+            player_sums.append(player_sum)
+
+    # Find the winner (player with the lowest sum of points)
+    winner_index = min(range(len(player_sums)), key=player_sums.__getitem__)
+
+    return render_template('end_screen.html', players=game.players, sums=player_sums, winner=winner_index)
 
 
 @app.route('/game', methods=['GET', 'POST'])
@@ -146,8 +189,7 @@ def game():
             card = game.take_face_down_card(exchange_index)
             revealed = True  # Set revealed status to True
         elif action == 'leave_face_down':
-            leave_pile_index = int(request.form['leave_pile_index'])
-            card = game.leave_face_down_card(leave_pile_index)
+            card = game.leave_face_down_card()
             revealed = False  # Reset revealed status
 
         return render_template('game.html',

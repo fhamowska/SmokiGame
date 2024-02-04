@@ -10,34 +10,47 @@
     <h2>Current Turn: Player {{ current_player + 1 }}</h2>
         <div class="container">
             {% for player_hand in players %}
-                <div>
-                    <h3>Player {{ loop.index }}'s Hand:</h3>
-                    <div class="section">
-                        {% for card in player_hand %}
-                            <div class="card">
-                            <div class="face-down">
-                                <p>
-                                    {{ card.number }}{% if card.action %}{{ card.action }}{% endif %}
-                                </p>
-                            </div>
-                            </div>
-                        {% endfor %}
-                    </div>
+    <div>
+        <h3>Player {{ loop.index }}'s Hand:</h3>
+        <div class="section">
+            {% for card in player_hand %}
+                <div class="card">
+                    {% if loop.index0 != 0 and loop.index != 6 %}
+                        <div >
+                            <p>
+                                {{ card.number }}{% if card.action %}{{ card.action }}{% endif %}
+                            </p>
+                        </div>
+                    {% else %}
+                        <p>
+                            {{ card.number }}{% if card.action %}{{ card.action }}{% endif %}
+                        </p>
+                    {% endif %}
                 </div>
+                {% if loop.index is divisibleby(3) and loop.index0 != 0 and loop.index != 6 %}
+                    <br>
+                {% endif %}
             {% endfor %}
+        </div>
+    </div>
+{% endfor %}
         </div>
 
         <div class="container">
-        <div class="section">
-            <div class="pile">
-                <h3>Face-Down Pile</h3>
-                    <button id="revealButton" onclick="revealFaceDown()">Reveal Face-Down Card</button>
+            <div class="section">
+                <div class="pile">
+                    <h3>Face-Down Pile</h3>
                     <div class="card">
+                    <div class="click" onclick="revealFaceDown()">
+                    Click<br>to<br>Reveal
+                    </div>
                         <div class="face-down">
-                            <p id="faceDownCard">{{ face_down_top.number }}{% if face_down_top.action %}{{ face_down_top.action }}{% endif %}</p>
+                            <p>
+                            {{ face_down_top.number }}{% if face_down_top.action %}{{ face_down_top.action }}{% endif %}
+                            </p>
                         </div>
                     </div>
-            </div>
+                </div>
             <div class="pile">
                 <h3>Face-Up Pile 1</h3>
                 <div class="card">
@@ -67,18 +80,27 @@
 <div class="player-actions">
         <form method="post" action="{{ url_for('game') }}">
             <input type="hidden" name="player_index" value="0">
-            <button type="submit" name="action" value="take_face_up">Take Face-Up</button>
-            <label for="pile_index">From Pile:</label>
+            <label id="label_pile" for="pile_index">From Pile:</label>
             <select id="pile_index" name="pile_index">
                 <option value="1">Pile 1</option>
                 <option value="2">Pile 2</option>
             </select>
             <!-- Add input for exchange_index -->
-            <label for="exchange_index">Exchange Card Index:</label>
-            <input type="number" id="exchange_index" name="exchange_index" required>
-            <button type="submit" name="action" value="take_face_down">Take Face-Down</button>
-            <button type="submit" name="action" value="leave_face_down">Leave Face-Down</button>
+            <label for="exchange_index">Exchange with Card:</label>
+            <select id="exchange_index" name="exchange_index" required>
+            {% for i in range(6) %}
+                <option value="{{ i }}">{{ i+1 }}</option>
+            {% endfor %}
+            </select><br>
+            <button type="submit" name="action" value="take_face_up">Take Face-Up</button>
+            <button id="takeFaceDownBtn" type="submit" name="action" value="take_face_down" class="hide-at-start">Take Face-Down</button>
+            <button id="leaveFaceDownBtn" type="submit" name="action" value="leave_face_down" class="hide-at-start">Leave Face-Down</button>
+            <button id="checkBtn" type="submit" form="endScreenForm" formaction="{{ url_for('end_screen') }}">Check!</button>
         </form>
+            <form method="post" action="{{ url_for('end_screen') }}" id="endScreenForm" style="display: none;">
+                 <input type="hidden" name="dummy_input" value="dummy_value">
+            </form>
+            </div>
     </div>
 
     {% if action_result %}
@@ -91,9 +113,37 @@
     </div>
 <script>
     function revealFaceDown() {
-        document.getElementById('faceDownCard').style.opacity = '100%';
-        document.getElementById('faceDownCard').style.backgroundColor = 'white';
-        document.getElementById('revealButton').style.display = 'none';
+        var faceDownParagraph = document.querySelector('.pile .face-down p');
+        var clickDiv = document.querySelector('.pile .click');
+        var takeFaceUpButton = document.querySelector('button[value="take_face_up"]');
+        var takeFaceDownButton = document.getElementById('takeFaceDownBtn');
+        var leaveFaceDownButton = document.getElementById('leaveFaceDownBtn');
+        var checkBtn = document.getElementById('checkBtn');
+        var labelPile = document.getElementById('label_pile');
+        var pileIndex = document.getElementById('pile_index');
+
+        faceDownParagraph.style.opacity = '1';
+        faceDownParagraph.style.backgroundColor = 'white';
+        clickDiv.style.display = 'none';
+        takeFaceUpButton.style.display = 'none';
+        labelPile.style.display = 'none';
+        pileIndex.style.display = 'none';
+
+        // Show the buttons
+        takeFaceDownButton.style.display = 'inline-block';
+        leaveFaceDownButton.style.display = 'inline-block';
+
+        checkBtn.style.display = 'none';
+
+             // Get the card value
+        var cardValue = parseInt(faceDownParagraph.innerText);
+
+        // Show the buttons based on the card value
+        if (cardValue === 10) {
+            takeFaceDownButton.style.display = 'inline-block';
+            leaveFaceDownButton.style.display = 'none';
+            takeFaceDownButton.style.backgroundColor = 'red';
+        }
     }
 </script>
 {% endblock %}

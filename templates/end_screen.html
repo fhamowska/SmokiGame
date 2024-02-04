@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Sen Game - End Screen</title>
+{% endblock %}
+
+{% block body %}
+    <div class="game-container">
+        <h1>Sen Game - End Screen</h1>
+        <h2>Winner: Player {{ winner + 1 }}</h2>
+
+        <div class="container">
+            {% for i in range(2) %}
+                <div>
+                    <h3>Player {{ i + 1 }}'s Hand:</h3>
+                    <div class="section">
+                        {% for card in players[i] %}
+                            {% if loop.index0 % 3 == 0 %}
+                                </div><div class="section">
+                            {% endif %}
+                            <div class="card">
+                                <div class="face-up">
+                                    <p>
+                                        {{ card.number }}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <p>Sum of Points: {{ sums[i] }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
