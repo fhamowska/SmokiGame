@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Smoki Game Rules</title>
+{% endblock %}
+
+{% block body %}
+    <div class="game-container">
+        <div class="container">
+            <div class="sectionRules">
+                <h1>Smoki Game Rules</h1>
+                <h2>Elements of the Game:</h2>
+                <ul>
+                    <li>Smoki: cards from -1 to 8 (4 of each).</li>
+                    <li>Kruki: cards 9 to 11 (4 of each).</li>
+                </ul>
+
+                <h2>Game Preparation:</h2>
+                <ul>
+                    <li>The game is played with 2 players.</li>
+                    <li>Each player receives 6 cards (only the first and the last are revealed).</li>
+                    <li>The remaining cards are placed on three piles (two of them are revealed, and one is covered).</li>
+                </ul>
+
+                <h2>Gameplay:</h2>
+                <p>The goal of the game is to score as few points as possible. In each turn, a player has the opportunity to peek at one of their cards. Then, the player has the following options:</p>
+                <ul>
+                    <li>Take a card from any face-up pile and add it to their cards (their old card is placed on the revealed pile). The player's turn ends.</li>
+                    <li>Take a card from the face-down pile. If the taken card suits the player, they add it to their cards (their old card is placed on the face-up pile). If not, they place it on the face-up pile. The player's turn ends.</li>
+                    <li>The player wants to end the game and check the results.</li>
+                </ul>
+
+                <h2>Kruki:</h2>
+                <ul>
+                    <li><b>10:</b> If a card with the number 10 is picked up from the face-down pile, the player must take it.</li>
+                    <li><b>11:</b> Copies the lowest value of the card lying to the right or left.</li>
+                </ul>
+
+                <h2>Scoring:</h2>
+                <ul>
+                    <li>The score is the sum of the player's card values.</li>
+                    <li>If a player has arranged two identical cards in one column, they score 0 points for them.</li>
+                </ul>
+            </div>
+            <form method="post" action="{{ url_for('new_game') }}" class="center-form">
+                    <button type="submit">New Game</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

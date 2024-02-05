@@ -14,14 +14,20 @@
         <div class="container">
         <div class="section">
             {% for player_hand in players %}
-        <div class="hand">
-        <h3>Player {{ loop.index }}'s Hand:</h3>
+                {% set outer_loop_index = loop.index %}
+                <div class="hand">
+                <h3>Player {{ loop.index }}'s Hand:</h3>
 
             {% for card in player_hand %}
                 <div class="card">
                     {% if loop.index0 != 0 and loop.index != 6 %}
-                        <div >
-                            <p>
+                        {% if current_player + 1 == outer_loop_index %}
+                        <div class="peek" onclick="peekCard(event)">
+                            <br>Peek
+                        </div>
+                        {% endif %}
+                        <div class="face-down">
+                            <p style="opacity: {% if turn_counter == current_player and loop.index < 2 and current_player + 1 == outer_loop_index %}1;{% else %}0{% endif %}">
                                 {{ card.number }}{% if card.action %}{{ card.action }}{% endif %}
                             </p>
                         </div>
@@ -46,7 +52,7 @@
                     <h3>Face-Down Pile</h3>
                     <div class="card">
                     <div class="click" onclick="revealFaceDown()">
-                    Click<br>to<br>Reveal
+                    <br>Reveal
                     </div>
                         <div class="face-down">
                             <p>
@@ -114,7 +120,6 @@
     {% endif %}
         </div>
     </div>
-    </div>
 <script>
     function revealFaceDown() {
         var faceDownParagraph = document.querySelector('.pile .face-down p');
@@ -127,26 +132,32 @@
         var pileIndex = document.getElementById('pile_index');
 
         faceDownParagraph.style.opacity = '1';
-        faceDownParagraph.style.backgroundColor = 'white';
         clickDiv.style.display = 'none';
         takeFaceUpButton.style.display = 'none';
         labelPile.style.display = 'none';
         pileIndex.style.display = 'none';
-
-        // Show the buttons
         takeFaceDownButton.style.display = 'inline-block';
         leaveFaceDownButton.style.display = 'inline-block';
-
         checkBtn.style.display = 'none';
-
-             // Get the card value
         var cardValue = parseInt(faceDownParagraph.innerText);
 
-        // Show the buttons based on the card value
         if (cardValue === 10) {
             takeFaceDownButton.style.display = 'inline-block';
             leaveFaceDownButton.style.display = 'none';
             takeFaceDownButton.style.backgroundColor = 'red';
+        }
+    }
+    function peekCard(event) {
+        var peekDivs = document.querySelectorAll('.card .peek');
+
+        peekDivs.forEach(function(peekDiv) {
+            peekDiv.style.display = 'none';
+        });
+
+        var selectedCard = event.target.closest('.card');
+        var opacityValue = selectedCard.querySelector('.face-down p').style.opacity;
+        if (opacityValue === '0') {
+            selectedCard.querySelector('.face-down p').style.opacity = '1';
         }
     }
 </script>

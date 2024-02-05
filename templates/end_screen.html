@@ -1,22 +1,24 @@
 {% extends 'base.html' %}
 
 {% block head %}
-    <title>Sen Game - End Screen</title>
+    <title>Smoki Game</title>
 {% endblock %}
 
 {% block body %}
     <div class="game-container">
-        <h1>Sen Game - End Screen</h1>
+        <h1>Smoki Game</h1>
         <h2>Winner: Player {{ winner + 1 }}</h2>
 
         <div class="container">
+        <div class="section">
             {% for i in range(2) %}
-                <div>
+                <div class="hand">
                     <h3>Player {{ i + 1 }}'s Hand:</h3>
                     <div class="section">
                         {% for card in players[i] %}
                             {% if loop.index0 % 3 == 0 %}
-                                </div><div class="section">
+                    </div>
+                    <div class="section">
                             {% endif %}
                             <div class="card">
                                 <div class="face-up">
@@ -31,11 +33,15 @@
                 </div>
             {% endfor %}
         </div>
+        </div>
         <div class="container">
             <div class="section">
                 <div class="player-actions">
-                    <form method="post" action="{{ url_for('new_game') }}">
+                    <form class="nav-button" method="post" action="{{ url_for('new_game') }}">
                         <button type="submit">New Game</button>
+                    </form>
+                    <form class="nav-button" method="post" action="{{ url_for('rules') }}">
+                        <button type="submit">Rules</button>
                     </form>
                 </div>
             </div>
