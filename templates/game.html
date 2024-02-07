@@ -105,9 +105,9 @@
             <button type="submit" name="action" value="take_face_up">Take Face-Up</button>
             <button id="takeFaceDownBtn" type="submit" name="action" value="take_face_down" class="hide-at-start">Take Face-Down</button>
             <button id="leaveFaceDownBtn" type="submit" name="action" value="leave_face_down" class="hide-at-start">Leave Face-Down</button>
-            <button id="checkBtn" type="submit" form="endScreenForm" formaction="{{ url_for('end_screen') }}">Check!</button>
+            <button id="checkBtn" type="submit" form="endScreenForm" formaction="{{ url_for('endgame') }}">Check!</button>
         </form>
-            <form method="post" action="{{ url_for('end_screen') }}" id="endScreenForm" style="display: none;">
+            <form method="post" action="{{ url_for('endgame') }}" id="endScreenForm" style="display: none;">
                  <input type="hidden" name="dummy_input" value="dummy_value">
             </form>
             </div>
@@ -121,6 +121,19 @@
         </div>
     </div>
 <script>
+    function peekCard(event) {
+        var peekDivs = document.querySelectorAll('.card .peek');
+
+        peekDivs.forEach(function(peekDiv) {
+            peekDiv.style.display = 'none';
+        });
+
+        var selectedCard = event.target.closest('.card');
+        var opacityValue = selectedCard.querySelector('.face-down p').style.opacity;
+        if (opacityValue === '0') {
+            selectedCard.querySelector('.face-down p').style.opacity = '1';
+        }
+    }
     function revealFaceDown() {
         var faceDownParagraph = document.querySelector('.pile .face-down p');
         var clickDiv = document.querySelector('.pile .click');
@@ -145,19 +158,6 @@
             takeFaceDownButton.style.display = 'inline-block';
             leaveFaceDownButton.style.display = 'none';
             takeFaceDownButton.style.backgroundColor = 'red';
-        }
-    }
-    function peekCard(event) {
-        var peekDivs = document.querySelectorAll('.card .peek');
-
-        peekDivs.forEach(function(peekDiv) {
-            peekDiv.style.display = 'none';
-        });
-
-        var selectedCard = event.target.closest('.card');
-        var opacityValue = selectedCard.querySelector('.face-down p').style.opacity;
-        if (opacityValue === '0') {
-            selectedCard.querySelector('.face-down p').style.opacity = '1';
         }
     }
 </script>

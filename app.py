@@ -1,9 +1,9 @@
-from flask import Flask, render_template, url_for, request, session, redirect
+from flask import Flask, render_template, url_for, request, redirect
 import random
 
 app = Flask(__name__)
 
-class Card:
+class PlayingCard:
     def __init__(self, number):
         self.number = int(number)
 
@@ -13,20 +13,20 @@ class Card:
     def to_dict(self):
         return {'number': self.number}
 
-class Deck:
+class CardDeck:
     def __init__(self):
         self.cards = []
 
-    def generate_deck(self):
-        # Add 4 cards of each number from -1 to 8
+    def generateDeck(self):
+        # 4 cards of each number from -1 to 8 representing smoki
         for number in range(-1, 9):
             for _ in range(4):
-                self.cards.append(Card(number))
+                self.cards.append(PlayingCard(number))
 
-        # Add 12 cards with the numbers 9, 10, 11 representing crows
+        # 12 cards with the numbers 9, 10, 11 representing kruki
         for number in range(9, 12):
             for _ in range(4):
-                self.cards.append(Card(number))
+                self.cards.append(PlayingCard(number))
 
         random.shuffle(self.cards)
 
@@ -34,22 +34,18 @@ class Game:
     def __init__(self):
         self.num_players = 2
         self.players = [[] for _ in range(2)]
-        self.face_down_pile = []
-        self.face_up_pile_1 = []
-        self.face_up_pile_2 = []
         self.current_player = 0
         self.turn_counter = 0
+        self.face_up_pile_1 = []
+        self.face_up_pile_2 = []
+        self.face_down_pile = []
 
-    def switch_to_next_player(self):
-        self.current_player = (self.current_player + 1) % self.num_players
-        self.turn_counter += 1
-
-    def deal_cards(self, deck):
+    def dealCards(self, deck):
         for _ in range(6):
             for player in self.players:
                 player.append(deck.cards.pop(0))
 
-    def reveal_deck_cards(self, deck):
+    def revealDeckCards(self, deck):
         card_1 = deck.cards.pop(0)
         card_2 = deck.cards.pop(0)
         card_3 = deck.cards.pop(0)
@@ -57,55 +53,26 @@ class Game:
         self.face_up_pile_2.append(card_2)
         self.face_down_pile.append(card_3)
 
-    def take_face_up_card(self, pile_index, exchange_index):
-        if pile_index == 1 and self.face_up_pile_1:
-            new_card = self.face_up_pile_1.pop()
-        elif pile_index == 2 and self.face_up_pile_2:
-            new_card = self.face_up_pile_2.pop()
-        else:
+    def takeFaceUpCard(self, pile_index, exchange_index):
+        if pile_index not in [1, 2]:
             return None
 
-        if 0 <= exchange_index < len(self.players[self.current_player]):
-            old_card = self.players[self.current_player].pop(exchange_index)
-            self.players[self.current_player].insert(exchange_index, new_card)
+        face_up_piles = {1: self.face_up_pile_1, 2: self.face_up_pile_2}
+        selected_pile = face_up_piles[pile_index]
 
-            if pile_index == 1:
-                self.face_up_pile_1.append(old_card)
-            else:
-                self.face_up_pile_2.append(old_card)
-
-            self.switch_to_next_player()
-
-            return old_card
-        else:
+        if not selected_pile or not (0 <= exchange_index < len(self.players[self.current_player])):
             return None
 
-    def fill_piles(self):
-        while len(self.face_up_pile_1) < 2:
-            if not deck.cards:
-                self.shuffle_discard_piles()
-            self.face_up_pile_1.append(deck.cards.pop(0))
+        new_card = selected_pile.pop()
+        old_card = self.players[self.current_player].pop(exchange_index)
+        self.players[self.current_player].insert(exchange_index, new_card)
+        selected_pile.append(old_card)
 
-        while len(self.face_up_pile_2) < 2:
-            if not deck.cards:
-                self.shuffle_discard_piles()
-            self.face_up_pile_2.append(deck.cards.pop(0))
+        self.switchToNextPlayer()
 
-        while len(self.face_down_pile) < 2:
-            if not deck.cards:
-                self.shuffle_discard_piles()
-            self.face_down_pile.append(deck.cards.pop(0))
+        return old_card
 
-    def shuffle_discard_piles(self):
-        random.shuffle(self.face_up_pile_1)
-        random.shuffle(self.face_up_pile_2)
-        random.shuffle(self.face_down_pile)
-        deck.cards.extend(self.face_up_pile_1)
-        deck.cards.extend(self.face_up_pile_2)
-        deck.cards.extend(self.face_down_pile)
-        random.shuffle(deck.cards)
-
-    def take_face_down_card(self, exchange_index):
+    def takeFaceDownCard(self, exchange_index):
         if not self.face_down_pile or not self.players[self.current_player]:
             return None
 
@@ -116,41 +83,65 @@ class Game:
             self.players[self.current_player].insert(exchange_index, new_card)
 
             self.face_up_pile_1.append(old_card)
-            self.fill_piles()
-            self.switch_to_next_player()
+            self.fillPiles()
+            self.switchToNextPlayer()
+
             return old_card
         else:
             return None
 
-    def leave_face_down_card(self):
+    def leaveFaceDownCard(self):
         if not self.face_down_pile:
             return None
 
         card = self.face_down_pile.pop()
         self.face_up_pile_1.append(card)
-        self.fill_piles()
-        self.switch_to_next_player()
+        self.fillPiles()
+        self.switchToNextPlayer()
 
         return card
+
+    def fillPile(self, pile, desired_length, deck):
+        while len(pile) < desired_length:
+            if not deck.cards:
+                self.shuffleDiscardPiles()
+            pile.append(deck.cards.pop(0))
+
+    def fillPiles(self):
+        self.fillPile(self.face_up_pile_1, 2, deck)
+        self.fillPile(self.face_up_pile_2, 2, deck)
+        self.fillPile(self.face_down_pile, 2, deck)
+
+    def shuffleDiscardPiles(self):
+        random.shuffle(self.face_up_pile_1)
+        random.shuffle(self.face_up_pile_2)
+        random.shuffle(self.face_down_pile)
+        deck.cards.extend(self.face_up_pile_1)
+        deck.cards.extend(self.face_up_pile_2)
+        deck.cards.extend(self.face_down_pile)
+        random.shuffle(deck.cards)
+
+    def switchToNextPlayer(self):
+        self.current_player = (self.current_player + 1) % self.num_players
+        self.turn_counter += 1
 
 @app.route('/new_game', methods=['POST'])
 def new_game():
     global game, deck
     game = Game()
-    deck = Deck()
-    deck.generate_deck()
-    game.deal_cards(deck)
-    game.reveal_deck_cards(deck)
+    deck = CardDeck()
+    deck.generateDeck()
+    game.dealCards(deck)
+    game.revealDeckCards(deck)
     return redirect(url_for('game'))
 
-@app.route('/end_screen', methods=['GET', 'POST'])
-def end_screen():
+@app.route('/endgame', methods=['GET', 'POST'])
+def endgame():
     player_sums = []
     if request.method == 'POST':
         for player_hand in game.players:
             for i, card in enumerate(player_hand):
                 if card.number == 11:
-                    # Handle edge cases for the card with number 11
                     if i == 0:
                         card.number = min(player_hand[i + 1].number, card.number)
                     elif i == len(player_hand) - 1:
@@ -180,7 +171,7 @@ def end_screen():
 
     winner_index = min(range(len(player_sums)), key=player_sums.__getitem__)
 
-    return render_template('end_screen.html', players=game.players, sums=player_sums, winner=winner_index)
+    return render_template('endgame.html', players=game.players, sums=player_sums, winner=winner_index)
 
 @app.route('/rules', methods=['GET', 'POST'])
 def rules():
@@ -189,49 +180,44 @@ def rules():
 @app.route('/game', methods=['GET', 'POST'])
 def game():
     revealed = False
+    game_state = {
+        'players': game.players,
+        'current_player': game.current_player,
+        'face_down_top': game.face_down_pile[-1] if game.face_down_pile else None,
+        'face_up_top_1': game.face_up_pile_1[-1] if game.face_up_pile_1 else None,
+        'face_up_top_2': game.face_up_pile_2[-1] if game.face_up_pile_2 else None,
+        'revealed': revealed,
+        'turn_counter': game.turn_counter
+    }
+
     if request.method == 'POST':
-        action = request.form['action']
-        pile_index = int(request.form['pile_index'])
-
+        action = request.form.get('action')
         if action == 'take_face_up':
-            exchange_index = int(request.form['exchange_index'])
-            card = game.take_face_up_card(pile_index, exchange_index)
+            exchange_index = int(request.form.get('exchange_index', 0))
+            pile_index = int(request.form.get('pile_index', 0))
+            game.takeFaceUpCard(pile_index, exchange_index)
         elif action == 'take_face_down':
-            exchange_index = int(request.form['exchange_index'])
-            card = game.take_face_down_card(exchange_index)
-            revealed = True
+            exchange_index = int(request.form.get('exchange_index', 0))
+            game.takeFaceDownCard(exchange_index)
+            game_state['revealed'] = True
         elif action == 'leave_face_down':
-            card = game.leave_face_down_card()
-            revealed = False
+            game.leaveFaceDownCard()
+            game_state['revealed'] = False
 
-        return render_template('game.html',
-                               players=game.players,
-                               current_player=game.current_player,
-                               face_down_top=game.face_down_pile[-1] if game.face_down_pile else None,
-                               face_up_top_1=game.face_up_pile_1[-1] if game.face_up_pile_1 else None,
-                               face_up_top_2=game.face_up_pile_2[-1] if game.face_up_pile_2 else None,
-                               revealed=revealed,
-                               turn_counter=game.turn_counter)
+        game_state.update({
+            'face_down_top': game.face_down_pile[-1] if game.face_down_pile else None,
+            'face_up_top_1': game.face_up_pile_1[-1] if game.face_up_pile_1 else None,
+            'face_up_top_2': game.face_up_pile_2[-1] if game.face_up_pile_2 else None,
+            'current_player': game.current_player,
+            'turn_counter': game.turn_counter
+        })
 
-    return render_template('game.html',
-                           players=game.players,
-                           current_player=game.current_player,
-                           face_down_top=game.face_down_pile[-1] if game.face_down_pile else None,
-                           face_up_top_1=game.face_up_pile_1[-1] if game.face_up_pile_1 else None,
-                           face_up_top_2=game.face_up_pile_2[-1] if game.face_up_pile_2 else None,
-                           revealed=revealed,
-                           turn_counter=game.turn_counter)
-
-
+    return render_template('game.html', **game_state)
 
 if __name__ == '__main__':
     game = Game()
-
-    deck = Deck()
-    deck.generate_deck()
-
-    game.deal_cards(deck)
-
-    game.reveal_deck_cards(deck)
-
+    deck = CardDeck()
+    deck.generateDeck()
+    game.dealCards(deck)
+    game.revealDeckCards(deck)
     app.run(host='0.0.0.0', port=12131, debug=True)
